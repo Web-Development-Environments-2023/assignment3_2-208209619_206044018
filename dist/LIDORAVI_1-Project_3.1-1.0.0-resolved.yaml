@@ -30,7 +30,7 @@ paths:
             schema:
               $ref: '#/components/schemas/User'
       responses:
-        "201":
+        "200":
           description: user added successfully
         "409":
           description: an existing user already exists
@@ -49,16 +49,26 @@ paths:
               $ref: '#/components/schemas/login_body'
         required: true
       responses:
-        "201":
+        "200":
           description: User logged in successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_201'
+                $ref: '#/components/schemas/inline_response_200'
         "404":
           description: Username not found
         "401":
           description: Incorrect password
+  /logout:
+    post:
+      tags:
+      - user
+      summary: Logout a user to the system
+      description: Logout a user to the system
+      operationId: Logout
+      responses:
+        "200":
+          description: User logged out successfully
   /createRecipe:
     post:
       tags:
@@ -91,47 +101,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Recipe'
-  /userHomePageRecipes/{userName}:
-    get:
-      tags:
-      - user
-      summary: returns 3 recipes of user's recipes
-      parameters:
-      - name: userName
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          example: reutme
-      responses:
-        "201":
-          description: 3 random user's recipes
-          content:
-            application/json:
-              schema:
-                maxItems: 3
-                minItems: 3
-                type: array
-                items:
-                  $ref: '#/components/schemas/Recipe'
-  /userFavoriteRecipes/{userName}:
+  /users/userFavoriteRecipes:
     get:
       tags:
       - user
       summary: returns user's favorite recipes
-      parameters:
-      - name: userName
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          example: reutme
       responses:
-        "201":
+        "200":
           description: user's favorite recipes
           content:
             application/json:
@@ -139,46 +115,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Recipe'
+  /users/userFavoriteRecipes/{recipe_id}:                
     put:
       tags:
-      - recipes
+      - user
       summary: Add a recipe to a user favorites list
       parameters:
-      - name: userName
-        in: path
-        description: The username
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: recipeId
-        in: query
-        description: The ID of the recipe
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: number
+        - name: recipe_id
+          in: path
+          description: The ID of the recipe
+          required: true
+          schema:
+            type: number
       responses:
         "200":
           description: Recipe added to the user's favorites list successfully
-  /userPersonalRecipes/{userName}:
+  /users/userPersonalRecipes:
     get:
       tags:
-      - recipes
+      - user
       summary: returns user's personal recipes
-      parameters:
-      - name: userName
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          example: reutme
       responses:
-        "201":
+        "200":
           description: user's personal recipes
           content:
             application/json:
@@ -186,22 +144,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Recipe'
-  /userFamilyRecipes/{userName}:
+  /users/userFamilyRecipes:
     get:
       tags:
-      - recipes
+      - user
       summary: returns user's family recipes
-      parameters:
-      - name: userName
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          example: reutme
       responses:
-        "201":
+        "200":
           description: user's family recipes
           content:
             application/json:
@@ -209,22 +158,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/FamilyRecipe'
-  /userLastViewedRecipes/{userName}:
+  /users/userLastViewedRecipes:
     get:
       tags:
-      - recipes
-      summary: get seen recipes
-      parameters:
-      - name: userName
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          example: reutme
+      - user
+      summary: get last 3 seen recipes
       responses:
-        "201":
+        "200":
           description: get seen recipes of user
           content:
             application/json:
@@ -232,29 +172,35 @@ paths:
                 type: array
                 items:
                   type: string
+  /users/userViewedRecipes:
+    get:
+      tags:
+      - user
+      summary: get all seen recipes
+      responses:
+        "200":
+          description: get seen recipes of user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /users/userViewedRecipes/{recipe_id}:           
     put:
       tags:
-      - recipes
+      - user
       summary: update seen recipes
       parameters:
-      - name: userName
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          example: reutme
-      - name: recipeID
-        in: query
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: number
-          example: 123456
+        - name: recipe_id
+          in: path
+          description: The ID of the recipe
+          required: true
+          schema:
+            type: number
+            example: 123456
       responses:
-        "201":
+        "200":
           description: update seen recipe to user
 components:
   schemas:
@@ -396,7 +342,7 @@ components:
           type: string
         password:
           type: string
-    inline_response_201:
+    inline_response_200:
       type: object
       properties:
         status:

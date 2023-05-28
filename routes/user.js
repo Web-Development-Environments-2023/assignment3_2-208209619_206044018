@@ -53,7 +53,44 @@ router.get('/favorites', async (req,res,next) => {
   }
 });
 
+/**
+ * This path returns the last 3 recepies that were viewed by the logged-in user
+ */
+router.get("/userLastViewedRecipes", async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const recipes = await user_utils.getViewedRecipes(user_id,3);
+    res.send(recipes);
+  } catch (error) {
+    next(error);
+  }
+});
+/**
+ * This path returns all the recepies that were viewed by the logged-in user
+ */
+router.get("/userViewedRecipes", async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const recipes = await user_utils.getViewedRecipes(user_id,0);
+    res.send(recipes);
+  } catch (error) {
+    next(error);
+  }
+});
 
 
+/**
+ * This path updates the viewed recepies that were viewed by the logged-in user
+ */
+router.put("/userViewedRecipes/{recipe_id}", async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const recipe_id = req.params.recipe_id;
+    await user_utils.putViewedRecipes(user_id,recipe_id);
+    res.status(200).send('Put operation of userViewedRecipes succeeded');
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;

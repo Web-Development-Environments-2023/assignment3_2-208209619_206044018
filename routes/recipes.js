@@ -26,6 +26,7 @@ router.get("/generalRandomRecipes", async (req, res, next) => {
     next(error);
   }
 });
+
 //TODO EXAMPLE
 router.get("/hello", async (req, res, next) => {
   try {
