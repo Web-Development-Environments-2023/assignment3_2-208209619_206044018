@@ -30,6 +30,8 @@ async function putViewedRecipes(user_id,recipe_id, recipe_type){
 
     const insertQuery = `INSERT INTO ViewedRecipes (user_id, recipe_id, recipe_type, date_time) VALUES ('${user_id}', '${recipe_id}', '${recipe_type}', CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE date_time = CURRENT_TIMESTAMP`;
     await DButils.execQuery(insertQuery);
+    test_put_viewed = await DButils.execQuery(`SELECT * FROM ViewedRecipes`);
+    console.log(test_put_viewed);
     return; 
   
 }
