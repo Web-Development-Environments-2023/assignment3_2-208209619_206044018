@@ -16,33 +16,20 @@ async function getViewedRecipes(user_id,amount=0){
 
     }  
     else{
-        const recipes = await DButils.execQuery(`SELECT recipe_id
-        FROM ViewedRecepies
+        const recipes = await DButils.execQuery(`SELECT recipe_id, recipe_type
+        FROM ViewedRecipes
         WHERE user_id = '${user_id}'
-        ORDER BY date DESC
+        ORDER BY date_time DESC
         LIMIT 3;`);
 
     }
     return recipes;
 }
 
-async function putViewedRecipes(user_id,recipe_id){
-    const currentDate = new Date().toISOString().slice(0, 19).replace("T", " ");
+async function putViewedRecipes(user_id,recipe_id, recipe_type){
 
-    // Check if the user_id and recipe_id combination already exists
-    const query = `SELECT * FROM ViewedRecipes WHERE user_id = '${user_id}' AND recipe_id = '${recipe_id}'`;
-    const existingRows = await DButils.execQuery(query);
-  
-    if (existingRows.length > 0) {
-      // If the combination exists, update the date to the current date
-      const updateQuery = `UPDATE ViewedRecipes SET date = '${currentDate}' WHERE user_id = '${user_id}' AND recipe_id = '${recipe_id}'`;
-      await DButils.execQuery(updateQuery);
-    } else {
-      // If the combination doesn't exist, add a new row
-      const insertQuery = `INSERT INTO ViewedRecipes (user_id, recipe_id, date) VALUES ('${user_id}', '${recipe_id}', '${currentDate}')`;
-      await DButils.execQuery(insertQuery);
-    }
-
+    const insertQuery = `INSERT INTO ViewedRecipes (user_id, recipe_id, recipe_type, date_time) VALUES ('${user_id}', '${recipe_id}', '${recipe_type}', CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE date_time = CURRENT_TIMESTAMP`;
+    await DButils.execQuery(insertQuery);
     return; 
   
 }
