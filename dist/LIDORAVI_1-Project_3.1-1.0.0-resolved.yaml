@@ -72,22 +72,7 @@ paths:
       responses:
         "200":
           description: User logged out successfully
-  /users/createRecipe:
-    post:
-      tags:
-      - user
-      summary: Create a new recipe
-      description: Adds a new recipe to the system
-      operationId: createRecipe
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/createRecipe_body'
-        required: true
-      responses:
-        "201":
-          description: Recipe created successfully
+  
   /recipes/generalRandomRecipes:
     get:
       tags:
@@ -104,6 +89,91 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Recipe'
+  
+  /recipes/searchRecipes/{amount_recipes}/{recipe_name}/{cuisine}/{diet}/{intolerance}:
+    get:
+      tags:
+      - recipes
+      summary: array with recipes
+      parameters:
+        - name: amount_recipes
+          in: path
+          description: The number recipes to search
+          required: true
+          schema:
+            type: number
+        - name: recipe_name
+          in: path
+          description: The name recipe to search
+          required: true
+          schema:
+            type: string
+        - name: cuisine
+          in: path
+          description: the cuisine to search by
+          required: true
+          schema:
+            type: string
+        - name: diet
+          in: path
+          description: the diet to search by
+          required: true
+          schema:
+            type: string
+        - name: intolerance
+          in: path
+          description: the diet to search by
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 3 random recipes
+          content:
+            application/json:
+              schema:
+                maxItems: 3
+                minItems: 3
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+  
+  /users/createFamilyRecipe:
+    post:
+      tags:
+      - user
+      summary: Create a new recipe
+      description: Adds a new family recipe to the system
+      operationId: createFamilyRecipe
+      requestBody:
+        content:
+          
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FamilyRecipe'
+        required: true
+      responses:
+        "200":
+          description: Recipe created successfully
+  
+  /users/createPersonalRecipe:
+    post:
+      tags:
+      - user
+      summary: Create a new recipe
+      description: Adds a new personal recipe to the system
+      operationId: createPersonalRecipe
+      requestBody:
+        content:
+          
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recipe'
+        required: true
+      responses:
+        "200":
+          description: Recipe created successfully
+          
   /users/userFavoriteRecipes:
     get:
       tags:
@@ -118,6 +188,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Recipe'
+                  
   /users/userFavoriteRecipes/{recipe_id}/{recipe_type}:                
     put:
       tags:
@@ -140,6 +211,7 @@ paths:
       responses:
         "200":
           description: Recipe added to the user's favorites list successfully
+          
   /users/userPersonalRecipes:
     get:
       tags:
@@ -154,6 +226,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Recipe'
+                  
   /users/userFamilyRecipes:
     get:
       tags:
@@ -168,6 +241,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/FamilyRecipe'
+                  
   /users/userLastViewedRecipes:
     get:
       tags:
@@ -182,6 +256,7 @@ paths:
                 type: array
                 items:
                   type: string
+                  
   /users/userViewedRecipes:
     get:
       tags:
@@ -196,6 +271,7 @@ paths:
                 type: array
                 items:
                   type: string
+                  
   /users/userViewedRecipes/{recipe_id}/{recipe_type}:           
     put:
       tags:
@@ -386,10 +462,3 @@ components:
           type: string
           
           
-    createRecipe_body:
-      type: object
-      properties:
-        userName:
-          type: string
-        recipe:
-          $ref: '#/components/schemas/Recipe'

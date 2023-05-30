@@ -82,11 +82,12 @@ router.get("/userViewedRecipes", async (req, res, next) => {
 /**
  * This path updates the viewed recepies that were viewed by the logged-in user
  */
-router.put("/userViewedRecipes/{recipe_id}", async (req, res, next) => {
+router.put("/userViewedRecipes/:recipe_id/:recipe_type", async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
     const recipe_id = req.params.recipe_id;
-    await user_utils.putViewedRecipes(user_id,recipe_id);
+    const recipe_type = req.params.recipe_type;
+    await user_utils.putViewedRecipes(user_id,recipe_id, recipe_type);
     res.status(200).send('Put operation of userViewedRecipes succeeded');
   } catch (error) {
     next(error);
