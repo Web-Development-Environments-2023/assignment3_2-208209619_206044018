@@ -7,7 +7,7 @@ const recipe_utils = require("./recipes_utils");
 
 
 async function markAsFavorite(user_id, recipe_id, recipe_type){
-    await DButils.execQuery(`insert into FavoriteRecipes values ('${user_id}',${recipe_id}, ${recipe_type})`);
+    await DButils.execQuery(`insert into FavoriteRecipes values (${user_id}, ${recipe_id},'${recipe_type}')`);
     return;
 }
 
@@ -18,13 +18,16 @@ async function getFavoriteRecipes(user_id){
 
 async function getPersonalRecipes(user_id){
     const recipes_id = await DButils.execQuery(`SELECT recipe_id from PersonalRecipes WHERE user_id='${user_id}'`);
-    console.log("step1");
-    return recipe_utils.handlePersonalRecipeById(recipes_id);
+    const ids = recipes_id.map(item => item.recipe_id);
+    const result = await recipe_utils.handlePersonalRecipeById(ids);
+    return result;
 }
 
 async function getFamilyRecipes(user_id){
     const recipes_id = await DButils.execQuery(`SELECT recipe_id from FamilyRecipes WHERE user_id='${user_id}'`);
-    return recipe_utils.handleFamilyRecipeById(recipes_id);
+    const ids = recipes_id.map(item => item.recipe_id)
+    const result = await recipe_utils.handleFamilyRecipeById(ids);
+    return result;
 }
 
 

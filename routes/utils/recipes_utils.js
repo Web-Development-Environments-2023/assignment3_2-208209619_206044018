@@ -62,8 +62,10 @@ async function getRecipeDetailsFamily(recipes_list) {
 
     recipes_final = []
     for(i=0; i<recipes_list.length; i++){
-        let recipe = recipes_list[i][0];
+        let recipe = recipes_list[i][0][0];
+
         let ingre = recipes_list[i][1];
+
         let steps = recipes_list[i][2];
 
         ingredient_list = ingre.map((ingredient) => {
@@ -75,7 +77,7 @@ async function getRecipeDetailsFamily(recipes_list) {
 
 
         recipes_final.push({
-            recipe_id: recipe.id,
+            recipe_id: recipe.recipe_id,
             recipe_name: recipe.recipe_name,
             prepare_time: recipe.prepare_time,
             image_recipe: recipe.image_recipe,
@@ -99,7 +101,7 @@ async function getRecipeDetailsPersonal(recipes_list) {
 
     recipes_final = []
     for(i=0; i<recipes_list.length; i++){
-        let recipe = recipes_list[i][0];
+        let recipe = recipes_list[i][0][0];
         let ingre = recipes_list[i][1];
         let steps = recipes_list[i][2];
 
@@ -107,12 +109,12 @@ async function getRecipeDetailsPersonal(recipes_list) {
             const name = ingredient.ingredient_name;
             const amount= ingredient.amount;
             const unitLong = ingredient.unitLong;
-            // const unitLong = ingredient.unitLong;
+  
             return {name, amount, unitLong}
         });
 
         recipes_final.push({
-            recipe_id: recipe.id,
+            recipe_id: recipe.recipe_id,
             recipe_name: recipe.recipe_name,
             prepare_time: recipe.prepare_time,
             image_recipe: recipe.image_recipe,
@@ -137,9 +139,12 @@ async function getRecipesPreview(recipe_array) {
     let API_id_list = [];
     let Personal_id_list = [];
     let Family_id_list = [];
+
     for (i=0; i<recipe_array.length; i++){
+
         let recipe_type = recipe_array[i][1];
         let recipe_id = recipe_array[i][0];
+
         if (recipe_type=='API'){
             API_id_list.push(recipe_id);
         }
@@ -153,13 +158,16 @@ async function getRecipesPreview(recipe_array) {
     }
 
     //get the recipes from the API spoon
-    rec_api = handleApiRecipeById(API_id_list);
+    rec_api = await handleApiRecipeById(API_id_list);
 
-    //TODO - get the recipes from family recipes
-    rec_family = handleFamilyRecipeById(Family_id_list);
 
-    //TODO - get the recipes from personal recipes
-    rec_personal = handlePersonalRecipeById(Personal_id_list);
+    //get the recipes from family recipes
+    rec_family = await handleFamilyRecipeById(Family_id_list);
+
+    //get the recipes from personal recipes
+    rec_personal = await handlePersonalRecipeById(Personal_id_list);
+
+    console.log(rec_family, rec_personal);
 
     return {"API": rec_api, 
             "personal": rec_personal,
@@ -168,30 +176,36 @@ async function getRecipesPreview(recipe_array) {
 
 async function handleFamilyRecipeById(recipes_id_list) {
     recipes_f_list=[]
+    console.log(recipes_id_list);
     for(i=0; i<recipes_id_list.length; i++){
-        const result_recipe = await DButils.execQuery(`SELECT * from FamilyRecipes WHERE recipe_id='${recipes_id_list[i]}'`);
-        const result_ingre = await DButils.execQuery(`SELECT ingredient_name, amount, unitLong from RecipesIngredients WHERE recipe_id='${recipes_id_list[i]}' AND recipe_type=family`);
-        const result_steps = await DButils.execQuery(`SELECT step_description from RecipesInstructions WHERE recipe_id='${recipes_id_list[i]}' AND recipe_type=family ORDER BY step_number`);
+        const result_recipe = await DButils.execQuery(`SELECT * from FamilyRecipes WHERE recipe_id=${recipes_id_list[i]}`);
+  
+        const result_ingre = await DButils.execQuery(`SELECT ingredient_name, amount, unitLong from RecipesIngredients WHERE recipe_id=${recipes_id_list[i]} AND recipe_type='family'`);
 
-        console.log([result_recipe, result_ingre, result_steps]);
-        recipes_p_list.push([result_recipe, result_ingre, result_steps]);
+        const result_steps = await DButils.execQuery(`SELECT step_description from RecipesInstructions WHERE recipe_id=${recipes_id_list[i]} AND recipe_type = 'family' ORDER BY step_number`);
+        recipes_f_list.push([result_recipe, result_ingre, result_steps]);
     }
-    return getRecipeDetailsFamily(recipes_f_list);
+
+    const final_recipes = await getRecipeDetailsFamily(recipes_f_list);
+    return final_recipes;
 }
 
 async function handlePersonalRecipeById(recipes_id_list) {
     recipes_p_list=[]
+    console.log(recipes_id_list);
     for(i=0; i<recipes_id_list.length; i++){
-        const result_recipe = await DButils.execQuery(`SELECT * from PersonalRecipes WHERE recipe_id='${recipes_id_list[i]}'`);
-        const result_ingre = await DButils.execQuery(`SELECT ingredient_name, amount, unitLong from from RecipesIngredients WHERE recipe_id='${recipes_id_list[i]}' AND recipe_type=personal`);
-        const result_steps = await DButils.execQuery(`SELECT step_description from RecipesInstructions WHERE recipe_id='${recipes_id_list[i]}' AND recipe_type=personal ORDER BY step_number`);
+        const result_recipe = await DButils.execQuery(`SELECT * from PersonalRecipes WHERE recipe_id=${recipes_id_list[i]}`);
+        const result_ingre = await DButils.execQuery(`SELECT ingredient_name, amount, unitLong from RecipesIngredients WHERE recipe_id=${recipes_id_list[i]} AND recipe_type='personal'`);
+        const result_steps = await DButils.execQuery(`SELECT step_description from RecipesInstructions WHERE recipe_id=${recipes_id_list[i]} AND recipe_type = 'personal' ORDER BY step_number`);
         recipes_p_list.push([result_recipe, result_ingre, result_steps]);
     }
-    return getRecipeDetailsPersonal(recipes_p_list);
+
+    const final_recipes = await getRecipeDetailsPersonal(recipes_p_list);
+    return final_recipes;
 }
 
 async function handleApiRecipeById(recipes_id_list) {
-    const idString = API_id_list.map(item => item.toString()).join(',');
+    const idString = recipes_id_list.map(item => item.toString()).join(',');
     let response = await handleInfoBulk(idString);
     const recipes = await getRecipeDetailsAPI(response.data);
     return recipes;
