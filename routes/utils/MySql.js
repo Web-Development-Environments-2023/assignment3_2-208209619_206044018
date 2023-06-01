@@ -1,44 +1,42 @@
 var mysql = require('mysql2');
 require("dotenv").config();
 
-
-const config={
-connectionLimit:4,
-  host: process.env.host,//"localhost"
-  user: process.env.DBUSERNAME,//"root"
+const dbConfig = {
+  connectionLimit: 4,
+  host: process.env.host,
+  user: process.env.DBUSERNAME,
   password: process.env.DBPASSWORD,
-  database:"lire_schema"
-}
+  database: "lire_schema"
+};
 
-const pool = mysql.createPool(config);
+const dbPool = mysql.createPool(dbConfig);
 
-
-const createConnection = () => {
+const getConnection = () => {
   return new Promise((resolve, reject) => {
-  pool.getConnection((err, connection) => {
+    dbPool.getConnection((err, connection) => {
       if (err) {
         reject(err);
       } else {
-    console.log("MySQL pool connected: threadId " + connection.threadId);
+        console.log("MySQL pool connected: threadId " + connection.threadId);
         resolve(connection);
       }
-           });
-         });
-       };
+    });
+  });
+};
 
-const query = (connection, sql, binding) => {
-         return new Promise((resolve, reject) => {
+const executeQuery = (connection, sql, binding) => {
+  return new Promise((resolve, reject) => {
     connection.query(sql, binding, (err, result, fields) => {
       if (err) {
         reject(err);
       } else {
         resolve(result);
       }
-     });
-   });
- };
+    });
+  });
+};
 
-const release = (connection) => {
+const releaseConnection = (connection) => {
   return new Promise((resolve, reject) => {
     console.log("MySQL pool released: threadId " + connection.threadId);
     connection.release();
@@ -46,10 +44,4 @@ const release = (connection) => {
   });
 };
 
-module.exports = { pool, createConnection, query, release };
-
-
-
-
-
-
+module.exports = { dbPool, getConnection, executeQuery, releaseConnection };
