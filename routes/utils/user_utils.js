@@ -84,7 +84,7 @@ async function createPersonalRecipe(user_id,recipe_name,prepare_time,likes,is_ve
 
     const insertInstructionsResult = await DButils.execQuery(insertInstructionsQuery);
 
-    console.log("Inserted recipe_id: ", recipe_id);
+    
     return recipe_id;
 
 }
@@ -92,10 +92,10 @@ async function createPersonalRecipe(user_id,recipe_name,prepare_time,likes,is_ve
 async function createFamilyRecipe(user_id,recipe_name,prepare_time,likes,is_vegan,is_veget,is_glutenFree,portions,image_recipe,recipe_owner,when_prepared,RecipesIngredients, RecipesInstructions){
     const insertRecipeQuery = `INSERT INTO FamilyRecipes (user_id, recipe_name, prepare_time, likes, is_vegan, is_veget, is_glutenFree, portions, image_recipe,recipe_owner,when_prepared) 
     VALUES (${user_id}, '${recipe_name}', ${prepare_time}, ${likes}, '${is_vegan}', '${is_veget}', '${is_glutenFree}', ${portions}, '${image_recipe}','${recipe_owner}','${when_prepared}')`;
-    console.log("here1");
+
     const insertRecipeResult = await DButils.execQuery(insertRecipeQuery);
     const recipe_id = insertRecipeResult.insertId;
-    console.log("here2");
+
 
     const values = [];
     for (let i = 0; i < RecipesIngredients.length; i++) {
@@ -104,22 +104,19 @@ async function createFamilyRecipe(user_id,recipe_name,prepare_time,likes,is_vega
       const unitLong = RecipesIngredients[i].unitLong;
       values.push(`(${recipe_id}, 'family', '${ingredient_name}', ${amount}, '${unitLong}')`);
     }
-    console.log("here3");
+   
 
     const insertIngredientsQuery = `INSERT INTO RecipesIngredients (recipe_id, recipe_type, ingredient_name, amount, unitLong) VALUES ${values.join(", ")}`;
 
     const insertIngredientsResult = await DButils.execQuery(insertIngredientsQuery);
-    console.log("here4");
+    
 
     const steps = RecipesInstructions.map((step_description) => `( ${recipe_id}, 'family', '${step_description}')`);
     const insertInstructionsQuery = `INSERT INTO RecipesInstructions (recipe_id, recipe_type, step_description) VALUES ${steps.join(", ")}`;
 
     const insertInstructionsResult = await DButils.execQuery(insertInstructionsQuery);
-    console.log("here5");
+  
 
-    console.log("Inserted recipe_id: ", recipe_id);
-
-    console.log("Tables: ", recipe_id);
     return recipe_id;
 
 }
