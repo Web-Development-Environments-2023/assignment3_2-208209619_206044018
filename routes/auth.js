@@ -24,14 +24,13 @@ router.post("/Register", async (req, res, next) => {
     if (users.find((x) => x.username === user_details.username))
       throw { status: 409, message: "Username taken" };
    
-      console.log("password",req.body.password);
    
       // add the new username
     let hash_password = bcrypt.hashSync(
       user_details.password,
       parseInt(process.env.bcrypt_saltRounds)
     );
-      console.log("hash_password: ", hash_password);
+     
     await DButils.execQuery(
       `INSERT INTO users (username, firstname, lastname, country, hash_password, email) VALUES ('${user_details.username}', '${user_details.firstname}', '${user_details.lastname}',
       '${user_details.country}', '${hash_password}', '${user_details.email}')`
@@ -47,8 +46,7 @@ router.post("/Login", async (req, res, next) => {
  
     // check that username exists
     const users = await DButils.execQuery("SELECT username FROM users");
-    console.log(users);
-    console.log("inserted username: ",req.body.username);
+
     if (!users.find((x) => x.username === req.body.username))
       throw { status: 401, message: "Username or Password incorrect" };
 

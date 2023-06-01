@@ -167,7 +167,6 @@ async function getRecipesPreview(recipe_array) {
     //get the recipes from personal recipes
     rec_personal = await handlePersonalRecipeById(Personal_id_list);
 
-    console.log(rec_family, rec_personal);
 
     return {"API": rec_api, 
             "personal": rec_personal,
@@ -176,7 +175,7 @@ async function getRecipesPreview(recipe_array) {
 
 async function handleFamilyRecipeById(recipes_id_list) {
     recipes_f_list=[]
-    console.log(recipes_id_list);
+ 
     for(i=0; i<recipes_id_list.length; i++){
         const result_recipe = await DButils.execQuery(`SELECT * from FamilyRecipes WHERE recipe_id=${recipes_id_list[i]}`);
   
@@ -192,7 +191,7 @@ async function handleFamilyRecipeById(recipes_id_list) {
 
 async function handlePersonalRecipeById(recipes_id_list) {
     recipes_p_list=[]
-    console.log(recipes_id_list);
+
     for(i=0; i<recipes_id_list.length; i++){
         const result_recipe = await DButils.execQuery(`SELECT * from PersonalRecipes WHERE recipe_id=${recipes_id_list[i]}`);
         const result_ingre = await DButils.execQuery(`SELECT ingredient_name, amount, unitLong from RecipesIngredients WHERE recipe_id=${recipes_id_list[i]} AND recipe_type='personal'`);
