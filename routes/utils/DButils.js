@@ -7,6 +7,7 @@ const connection = await MySql.connection();
     try {
     await connection.query("START TRANSACTION");
     returnValue = await connection.query(query);
+    await MySql.query(connection, "COMMIT");
   } catch (err) {
     await connection.query("ROLLBACK");
     console.log('ROLLBACK at querySignUp', err);
