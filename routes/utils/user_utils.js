@@ -207,17 +207,6 @@ async function handleApiRecipeById(recipes_id_list) {
 }
 
 
-async function getRecipeDetailsFamily(recipes_list){
-    //TODO
-    recipes_final = []
-
-}
-
-async function getRecipeDetailsPersonal(recipes_list){
-    //TODO
-}
-
-
 
 async function RandomRecipe(number) {
     let response = await handleRandomRecipe(number);
@@ -348,4 +337,5 @@ exports.handlePersonalRecipeById = handlePersonalRecipeById;
 exports.handleFamilyRecipeById = handleFamilyRecipeById;
 exports.createPersonalRecipe = createPersonalRecipe;
 exports.createFamilyRecipe = createFamilyRecipe;
-
+exports.getPersonalRecipes=getPersonalRecipes;
+exports.getFamilyRecipes=getFamilyRecipes;
