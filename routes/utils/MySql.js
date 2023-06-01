@@ -15,28 +15,28 @@ const pool = mysql.createPool(config);
 
 const createConnection = () => {
   return new Promise((resolve, reject) => {
-    pool.getConnection((err, connection) => {
+  pool.getConnection((err, connection) => {
       if (err) {
         reject(err);
       } else {
-        console.log("MySQL pool connected: threadId " + connection.threadId);
+    console.log("MySQL pool connected: threadId " + connection.threadId);
         resolve(connection);
       }
-    });
-  });
-};
+           });
+         });
+       };
 
 const query = (connection, sql, binding) => {
-  return new Promise((resolve, reject) => {
+         return new Promise((resolve, reject) => {
     connection.query(sql, binding, (err, result, fields) => {
       if (err) {
         reject(err);
       } else {
         resolve(result);
       }
-    });
-  });
-};
+     });
+   });
+ };
 
 const release = (connection) => {
   return new Promise((resolve, reject) => {

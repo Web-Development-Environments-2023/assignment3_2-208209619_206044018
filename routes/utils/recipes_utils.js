@@ -59,7 +59,7 @@ async function getRecipeDetailsAPI(recipes_list) {
 }
 
 async function getRecipeDetailsFamily(recipes_list) {
-    //TODO
+
     recipes_final = []
     for(i=0; i<recipes_list.length; i++){
         let recipe = recipes_list[i][0];
@@ -69,8 +69,8 @@ async function getRecipeDetailsFamily(recipes_list) {
         ingredient_list = ingre.map((ingredient) => {
             const name = ingredient.ingredient_name;
             const amount= ingredient.amount;
-            // const unitLong = ingredient.unitLong;
-            return {name, amount}
+            const unitLong = ingredient.unitLong;
+            return {name, amount, unitLong}
         });
 
 
@@ -96,7 +96,7 @@ async function getRecipeDetailsFamily(recipes_list) {
 }
 
 async function getRecipeDetailsPersonal(recipes_list) {
-    //TODO
+
     recipes_final = []
     for(i=0; i<recipes_list.length; i++){
         let recipe = recipes_list[i][0];
@@ -106,8 +106,9 @@ async function getRecipeDetailsPersonal(recipes_list) {
         ingredient_list = ingre.map((ingredient) => {
             const name = ingredient.ingredient_name;
             const amount= ingredient.amount;
+            const unitLong = ingredient.unitLong;
             // const unitLong = ingredient.unitLong;
-            return {name, amount}
+            return {name, amount, unitLong}
         });
 
         recipes_final.push({
@@ -163,16 +164,16 @@ async function getRecipesPreview(recipe_array) {
     return {"API": rec_api, 
             "personal": rec_personal,
             "family": rec_family}
-
 }
 
 async function handleFamilyRecipeById(recipes_id_list) {
     recipes_f_list=[]
     for(i=0; i<recipes_id_list.length; i++){
         const result_recipe = await DButils.execQuery(`SELECT * from FamilyRecipes WHERE recipe_id='${recipes_id_list[i]}'`);
-        const result_ingre = await DButils.execQuery(`SELECT ingredient_name, amount from RecipesIngredients WHERE recipe_id='${recipes_id_list[i]}' AND recipe_type=family`);
+        const result_ingre = await DButils.execQuery(`SELECT ingredient_name, amount, unitLong from RecipesIngredients WHERE recipe_id='${recipes_id_list[i]}' AND recipe_type=family`);
         const result_steps = await DButils.execQuery(`SELECT step_description from RecipesInstructions WHERE recipe_id='${recipes_id_list[i]}' AND recipe_type=family ORDER BY step_number`);
 
+        console.log([result_recipe, result_ingre, result_steps]);
         recipes_p_list.push([result_recipe, result_ingre, result_steps]);
     }
     return getRecipeDetailsFamily(recipes_f_list);
@@ -182,7 +183,7 @@ async function handlePersonalRecipeById(recipes_id_list) {
     recipes_p_list=[]
     for(i=0; i<recipes_id_list.length; i++){
         const result_recipe = await DButils.execQuery(`SELECT * from PersonalRecipes WHERE recipe_id='${recipes_id_list[i]}'`);
-        const result_ingre = await DButils.execQuery(`SELECT ingredient_name, amount from from RecipesIngredients WHERE recipe_id='${recipes_id_list[i]}' AND recipe_type=personal`);
+        const result_ingre = await DButils.execQuery(`SELECT ingredient_name, amount, unitLong from from RecipesIngredients WHERE recipe_id='${recipes_id_list[i]}' AND recipe_type=personal`);
         const result_steps = await DButils.execQuery(`SELECT step_description from RecipesInstructions WHERE recipe_id='${recipes_id_list[i]}' AND recipe_type=personal ORDER BY step_number`);
         recipes_p_list.push([result_recipe, result_ingre, result_steps]);
     }
@@ -194,17 +195,6 @@ async function handleApiRecipeById(recipes_id_list) {
     let response = await handleInfoBulk(idString);
     const recipes = await getRecipeDetailsAPI(response.data);
     return recipes;
-}
-
-
-async function getRecipeDetailsFamily(recipes_list){
-    //TODO
-    recipes_final = []
-
-}
-
-async function getRecipeDetailsPersonal(recipes_list){
-    //TODO
 }
 
 
@@ -277,6 +267,7 @@ async function handleInfoBulk(id_string) {
 exports.getRecipeDetailsAPI = getRecipeDetailsAPI;
 exports.searchRecipes = searchRecipes;
 exports.RandomRecipe = RandomRecipe;
+// exports.getFavoriteRecipes=getFavoriteRecipes;
 exports.getRecipesPreview = getRecipesPreview;
 exports.handlePersonalRecipeById = handlePersonalRecipeById;
 exports.handleFamilyRecipeById = handleFamilyRecipeById;
