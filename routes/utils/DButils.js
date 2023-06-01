@@ -3,18 +3,17 @@ const MySql = require("./MySql");
 
 exports.execQuery = async function (query) {
     let returnValue = []
-const connection = await MySql.connection();
+    const connection = await MySql.createConnection();
     try {
-    await connection.query("START TRANSACTION");
-    returnValue = await connection.query(query);
-    await MySql.query(connection, "COMMIT");
+    await MySql.query(connection,"START TRANSACTION");
+    returnValue = await MySql.query(connection, query);
+    await MySql.query(connection, "COMMIT"); 
   } catch (err) {
     await connection.query("ROLLBACK");
     console.log('ROLLBACK at querySignUp', err);
     throw err;
   } finally {
-    await connection.release();
+    await MySql.release(connection);
   }
   return returnValue
 }
-

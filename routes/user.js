@@ -76,6 +76,7 @@ router.get('/userFamilyRecipes', async (req,res,next) => {
     next(error); 
   }
 });
+
 /**
  * This path returns the last 3 recepies that were viewed by the logged-in user
  */
@@ -124,8 +125,6 @@ router.put("/userViewedRecipes/:recipe_id/:recipe_type", async (req, res, next) 
  */
 router.post('/createPersonalRecipe', async (req,res,next) => {
   try{
-    console.log("user ->inside createPersonalRecipe");
-    console.log("body params: ", req.body);
     const user_id = req.session.user_id;
     const recipe_name = req.body.recipe_name;
     const prepare_time = req.body.prepare_time;

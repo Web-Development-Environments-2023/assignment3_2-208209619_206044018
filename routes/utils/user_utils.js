@@ -1,7 +1,8 @@
 const axios = require("axios");
 const { param } = require("../user");
 const api_domain = "https://api.spoonacular.com/recipes";
-
+const DButils = require("./DButils");
+const recipe_utils = require("./recipes_utils");
 
 
 /**
@@ -131,12 +132,12 @@ async function getRecipeDetailsPersonal(recipes_list) {
 async function getPersonalRecipes(user_id){
     const recipes_id = await DButils.execQuery(`SELECT recipe_id from PersonalRecipes WHERE user_id='${user_id}'`);
     
-    return await rec_utils.handlePersonalRecipeById(recipes_id);
+    return await recipe_utils.handlePersonalRecipeById(recipes_id);
 }
 
 async function getFamilyRecipes(user_id){
     const recipes_id = await DButils.execQuery(`SELECT recipe_id from FamilyRecipes WHERE user_id='${user_id}'`);
-    return await rec_utils.handleFamilyRecipeById(recipes_id);
+    return await recipe_utils.handleFamilyRecipeById(recipes_id);
 }
 
 
@@ -273,7 +274,6 @@ async function handleInfoBulk(id_string) {
 
 
 async function createPersonalRecipe(user_id,recipe_name,prepare_time,likes,is_vegan,is_veget,is_glutenFree,portions,image_recipe,RecipesIngredients, RecipesInstructions){
-    console.log("user_utils -> inside createPersonalRecipe");
 
     const insertRecipeQuery = `INSERT INTO PersonalRecipes (user_id, recipe_name, prepare_time, likes, is_vegan, is_veget, is_glutenFree, portions, image_recipe) 
                                VALUES (${user_id}, '${recipe_name}', ${prepare_time}, ${likes}, '${is_vegan}', '${is_veget}', '${is_glutenFree}', ${portions}, '${image_recipe}')`;
@@ -285,15 +285,16 @@ async function createPersonalRecipe(user_id,recipe_name,prepare_time,likes,is_ve
     for (let i = 0; i < RecipesIngredients.length; i++) {
       const ingredient_name = RecipesIngredients[i].ingredient_name;
       const amount = RecipesIngredients[i].amount;
-      values.push(`(${recipe_id}, 'personal', '${ingredient_name}', ${amount})`);
+      const unitLong = RecipesIngredients[i].unitLong;
+      values.push(`(${recipe_id}, 'personal', '${ingredient_name}', ${amount}, '${unitLong}')`);
     }
 
-    const insertIngredientsQuery = `INSERT INTO RecipesIngredients (recipe_id, recipe_type, ingredient_name, amount) VALUES ${values.join(", ")}`;
+    const insertIngredientsQuery = `INSERT INTO RecipesIngredients (recipe_id, recipe_type, ingredient_name, amount, unitLong) VALUES ${values.join(", ")}`;
 
     const insertIngredientsResult = await DButils.execQuery(insertIngredientsQuery);
 
-    const steps = RecipesInstructions.map((step_description, index) => `(${index + 1}, ${recipe_id}, 'personal', '${step_description}')`);
-    const insertInstructionsQuery = `INSERT INTO RecipesInstructions (step_number, recipe_id, recipe_type, step_description) VALUES ${steps.join(", ")}`;
+    const steps = RecipesInstructions.map((step_description) => `( ${recipe_id}, 'personal', '${step_description}')`);
+    const insertInstructionsQuery = `INSERT INTO RecipesInstructions (recipe_id, recipe_type, step_description) VALUES ${steps.join(", ")}`;
 
     const insertInstructionsResult = await DButils.execQuery(insertInstructionsQuery);
 
@@ -303,28 +304,36 @@ async function createPersonalRecipe(user_id,recipe_name,prepare_time,likes,is_ve
 }
 
 async function createFamilyRecipe(user_id,recipe_name,prepare_time,likes,is_vegan,is_veget,is_glutenFree,portions,image_recipe,recipe_owner,when_prepared,RecipesIngredients, RecipesInstructions){
-    const insertRecipeQuery = `INSERT INTO PersonalRecipes (user_id, recipe_name, prepare_time, likes, is_vegan, is_veget, is_glutenFree, portions, image_recipe,recipe_owner,when_prepared) 
+    const insertRecipeQuery = `INSERT INTO FamilyRecipes (user_id, recipe_name, prepare_time, likes, is_vegan, is_veget, is_glutenFree, portions, image_recipe,recipe_owner,when_prepared) 
     VALUES (${user_id}, '${recipe_name}', ${prepare_time}, ${likes}, '${is_vegan}', '${is_veget}', '${is_glutenFree}', ${portions}, '${image_recipe}','${recipe_owner}','${when_prepared}')`;
-
+    console.log("here1");
     const insertRecipeResult = await DButils.execQuery(insertRecipeQuery);
     const recipe_id = insertRecipeResult.insertId;
+    console.log("here2");
+
     const values = [];
     for (let i = 0; i < RecipesIngredients.length; i++) {
-        const ingredient_name = RecipesIngredients[i].ingredient_name;
-        const amount = RecipesIngredients[i].amount;
-        values.push(`(${recipe_id}, 'family', '${ingredient_name}', ${amount})`);
+      const ingredient_name = RecipesIngredients[i].ingredient_name;
+      const amount = RecipesIngredients[i].amount;
+      const unitLong = RecipesIngredients[i].unitLong;
+      values.push(`(${recipe_id}, 'family', '${ingredient_name}', ${amount}, '${unitLong}')`);
     }
+    console.log("here3");
 
-    const insertIngredientsQuery = `INSERT INTO RecipesIngredients (recipe_id, recipe_type, ingredient_name, amount) VALUES ${values.join(", ")}`;
+    const insertIngredientsQuery = `INSERT INTO RecipesIngredients (recipe_id, recipe_type, ingredient_name, amount, unitLong) VALUES ${values.join(", ")}`;
 
     const insertIngredientsResult = await DButils.execQuery(insertIngredientsQuery);
+    console.log("here4");
 
-    const steps = RecipesInstructions.map((step_description, index) => `(${index + 1}, ${recipe_id}, 'family', '${step_description}')`);
-    const insertInstructionsQuery = `INSERT INTO RecipesInstructions (step_number, recipe_id, recipe_type, step_description) VALUES ${steps.join(", ")}`;
+    const steps = RecipesInstructions.map((step_description) => `( ${recipe_id}, 'family', '${step_description}')`);
+    const insertInstructionsQuery = `INSERT INTO RecipesInstructions (recipe_id, recipe_type, step_description) VALUES ${steps.join(", ")}`;
 
     const insertInstructionsResult = await DButils.execQuery(insertInstructionsQuery);
+    console.log("here5");
 
     console.log("Inserted recipe_id: ", recipe_id);
+
+    console.log("Tables: ", recipe_id);
     return recipe_id;
 
 }
