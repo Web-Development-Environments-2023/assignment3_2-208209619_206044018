@@ -33,7 +33,7 @@ async function getFamilyRecipes(user_id){
 
 async function getViewedRecipes(user_id,amount=0){
     if (amount==0){
-        const recipes = await DButils.execQuery(`SELECT recipe_id from ViewedRecipes where user_id='${user_id}'`);
+        const recipes = await DButils.execQuery(`SELECT recipe_id, recipe_type from ViewedRecipes where user_id='${user_id}'`);
 
     }  
     else{

@@ -84,7 +84,7 @@ router.get("/userLastViewedRecipes", async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
     const recipes = await user_utils.getViewedRecipes(user_id,3);
-    res.send(recipes);
+    res.send({"recipes":recipes});
   } catch (error) {
     next(error);
   }
@@ -96,7 +96,7 @@ router.get("/userViewedRecipes", async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
     const recipes = await user_utils.getViewedRecipes(user_id,0);
-    res.send(recipes);
+    res.send({"recipes":recipes});
   } catch (error) {
     next(error);
   }

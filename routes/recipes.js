@@ -10,7 +10,8 @@ router.get("/generalRandomRecipes", async (req, res, next) => {
   try {
     const recipes = await recipes_utils.RandomRecipe(3);
     console.log(recipes);
-    res.send(recipes);
+    // res.send(recipes);
+    res.send({"recipes": recipes});
   } catch (error) {
     next(error);
   }
