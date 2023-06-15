@@ -96,6 +96,7 @@ router.get("/userViewedRecipes", async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
     const recipes = await user_utils.getViewedRecipes(user_id,0);
+    console.log("recipes:: ",recipes);
     res.send({"recipes":recipes});
   } catch (error) {
     next(error);
