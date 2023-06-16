@@ -218,8 +218,7 @@ async function RandomRecipe(number) {
 async function handleRandomRecipe(number) {
     return await axios.get(`${api_domain}/random`, {
         headers:{
-            // "x-api-key":process.env.APIKEYSPOON
-            "x-api-key":"ef2ff7f207f6451f8fe647b555147a81"
+            "x-api-key":process.env.APIKEYSPOON
         },
         params: {
             "number":number
@@ -255,8 +254,7 @@ async function handlesearchRecipes(amount_recipes=5, recipe_name, cuisine, diet,
 
     return await axios.get(`${api_domain}/complexSearch`, {
         headers:{
-            // "x-api-key":process.env.APIKEYSPOON
-            "x-api-key":"ef2ff7f207f6451f8fe647b555147a81"
+            "x-api-key":process.env.APIKEYSPOON
         },
         params: params_api
     });
@@ -265,8 +263,7 @@ async function handlesearchRecipes(amount_recipes=5, recipe_name, cuisine, diet,
 async function handleInfoBulk(id_string) {
     return await axios.get(`${api_domain}/informationBulk`, {
         headers:{
-            // "x-api-key":process.env.APIKEYSPOON
-            "x-api-key":"ef2ff7f207f6451f8fe647b555147a81"
+            "x-api-key":process.env.APIKEYSPOON
         },
         params: {            
             "ids": id_string

@@ -7,6 +7,7 @@ const dbConfig = {
   user: process.env.DBUSERNAME,
   password: process.env.DBPASSWORD,
   database: "lire_schema"
+  
 };
 
 const dbPool = mysql.createPool(dbConfig);
