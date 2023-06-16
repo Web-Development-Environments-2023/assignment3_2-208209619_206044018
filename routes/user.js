@@ -49,7 +49,8 @@ router.get('/userFavoriteRecipes', async (req,res,next) => {
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push([element.recipe_id, element.recipe_type])); //extracting the recipe ids and recipe_type into array
     const results = await recipe_utils.getRecipesPreview(recipes_id_array);
-    res.status(200).send(results);
+    console.log({"recipes":[results][0].API[0].recipe_instruction});
+    res.status(200).send({"recipes":[results]});
   } catch(error){
     next(error); 
   }

@@ -63,11 +63,8 @@ async function getRecipeDetailsFamily(recipes_list) {
     recipes_final = []
     for(i=0; i<recipes_list.length; i++){
         let recipe = recipes_list[i][0][0];
-
         let ingre = recipes_list[i][1];
-
-        let steps = recipes_list[i][2];
-
+        let steps = [{"steps": recipes_list[i][2].map((step) => step.step_description)}];
         ingredient_list = ingre.map((ingredient) => {
             const name = ingredient.ingredient_name;
             const amount= ingredient.amount;
@@ -103,7 +100,7 @@ async function getRecipeDetailsPersonal(recipes_list) {
     for(i=0; i<recipes_list.length; i++){
         let recipe = recipes_list[i][0][0];
         let ingre = recipes_list[i][1];
-        let steps = recipes_list[i][2];
+        let steps = [{"steps": recipes_list[i][2].map((step) => step.step_description)}];
 
         ingredient_list = ingre.map((ingredient) => {
             const name = ingredient.ingredient_name;
@@ -221,7 +218,8 @@ async function RandomRecipe(number) {
 async function handleRandomRecipe(number) {
     return await axios.get(`${api_domain}/random`, {
         headers:{
-            "x-api-key":process.env.APIKEYSPOON
+            // "x-api-key":process.env.APIKEYSPOON
+            "x-api-key":"ef2ff7f207f6451f8fe647b555147a81"
         },
         params: {
             "number":number
@@ -257,7 +255,8 @@ async function handlesearchRecipes(amount_recipes=5, recipe_name, cuisine, diet,
 
     return await axios.get(`${api_domain}/complexSearch`, {
         headers:{
-            "x-api-key":process.env.APIKEYSPOON
+            // "x-api-key":process.env.APIKEYSPOON
+            "x-api-key":"ef2ff7f207f6451f8fe647b555147a81"
         },
         params: params_api
     });
@@ -266,7 +265,8 @@ async function handlesearchRecipes(amount_recipes=5, recipe_name, cuisine, diet,
 async function handleInfoBulk(id_string) {
     return await axios.get(`${api_domain}/informationBulk`, {
         headers:{
-            "x-api-key":process.env.APIKEYSPOON
+            // "x-api-key":process.env.APIKEYSPOON
+            "x-api-key":"ef2ff7f207f6451f8fe647b555147a81"
         },
         params: {            
             "ids": id_string
