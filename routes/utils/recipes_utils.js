@@ -281,4 +281,5 @@ exports.RandomRecipe = RandomRecipe;
 exports.getRecipesPreview = getRecipesPreview;
 exports.handlePersonalRecipeById = handlePersonalRecipeById;
 exports.handleFamilyRecipeById = handleFamilyRecipeById;
+exports.handleApiRecipeById = handleApiRecipeById;
 

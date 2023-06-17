@@ -60,8 +60,8 @@ router.get('/userPersonalRecipes', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
     
-    const recipes_id = await user_utils.getPersonalRecipes(user_id);
-    res.status(200).send(recipes_id);
+    const personal_recipes = await user_utils.getPersonalRecipes(user_id);
+    res.status(200).send({"recipes":personal_recipes});
   } catch(error){
     next(error); 
   }
@@ -72,8 +72,8 @@ router.get('/userFamilyRecipes', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
     
-    const recipes_id = await user_utils.getFamilyRecipes(user_id);
-    res.status(200).send(recipes_id);
+    const family_recipes = await user_utils.getFamilyRecipes(user_id);
+    res.status(200).send({"recipes":family_recipes});
   } catch(error){
     next(error); 
   }
@@ -84,8 +84,14 @@ router.get('/userFamilyRecipes', async (req,res,next) => {
 router.get("/userLastViewedRecipes", async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
-    const recipes = await user_utils.getViewedRecipes(user_id,3);
-    res.send({"recipes":recipes});
+    const recipes_id_type = await user_utils.getViewedRecipes(user_id,3);
+    
+    const filteredRecipesId = recipes_id_type.filter(recipe => recipe.recipe_type === "API");
+    const recipeIds = filteredRecipesId.map(recipe => recipe.recipe_id);
+
+    const recipes = await recipe_utils.handleApiRecipeById(recipeIds);
+    res.send({ "recipes": recipes });
+
   } catch (error) {
     next(error);
   }
