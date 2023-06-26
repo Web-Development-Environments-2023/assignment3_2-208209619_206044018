@@ -20,193 +20,181 @@ const DButils = require("./DButils");
 //     });
 // }
 async function getRecipeDetailsAPI(recipes_list) {
-    recipes_final = []
-    for(i=0; i<recipes_list.length; i++){
-        let { id, title, readyInMinutes, image, servings, aggregateLikes, extendedIngredients,analyzedInstructions, vegan, vegetarian, glutenFree } = recipes_list[i];
-
-
-        ingredient_list = extendedIngredients.map((ingredient) => {
-            const { name } = ingredient;
-            const { amount } = ingredient.measures.us;
-            const { unitLong } = ingredient.measures.us;
-            return {name, amount, unitLong}
-        });
-
-        instruct_list = analyzedInstructions.map((instruction) => {
-            const steps = instruction.steps.map((step) => step.step);
-          
-            return { steps};
-          });
-     
-
-        recipes_final.push({
-            recipe_id: id,
-            recipe_name: title,
-            prepare_time: readyInMinutes,
-            image_recipe: image,
-            portions: servings,
-            likes: aggregateLikes,
-            is_vegan: vegan,
-            is_veget: vegetarian,
-            is_glutenFree: glutenFree,
-            recipe_ingredient: ingredient_list,
-            recipe_instruction: instruct_list
-            
-        })
-    }
-
-    return recipes_final
-}
-
-async function getRecipeDetailsFamily(recipes_list) {
-
-    recipes_final = []
-    for(i=0; i<recipes_list.length; i++){
-        let recipe = recipes_list[i][0][0];
-        let ingre = recipes_list[i][1];
-        let steps = [{"steps": recipes_list[i][2].map((step) => step.step_description)}];
-        ingredient_list = ingre.map((ingredient) => {
-            const name = ingredient.ingredient_name;
-            const amount= ingredient.amount;
-            const unitLong = ingredient.unitLong;
-            return {name, amount, unitLong}
-        });
-
-
-        recipes_final.push({
-            recipe_id: recipe.recipe_id,
-            recipe_name: recipe.recipe_name,
-            prepare_time: recipe.prepare_time,
-            image_recipe: recipe.image_recipe,
-            portions: recipe.portions,
-            likes: recipe.likes,
-            is_vegan: recipe.is_vegan,
-            is_veget: recipe.is_veget,
-            is_glutenFree: recipe.is_glutenFree,
-            recipe_ingredient: ingredient_list,
-            recipe_instruction: steps,
-            recipe_owner: recipe.recipe_owner, 
-            when_prepared: recipe.when_prepared
-            
-        })
-    }
-
-    return recipes_final
-}
-
-async function getRecipeDetailsPersonal(recipes_list) {
-
-    recipes_final = []
-    for(i=0; i<recipes_list.length; i++){
-        let recipe = recipes_list[i][0][0];
-        let ingre = recipes_list[i][1];
-        let steps = [{"steps": recipes_list[i][2].map((step) => step.step_description)}];
-
-        ingredient_list = ingre.map((ingredient) => {
-            const name = ingredient.ingredient_name;
-            const amount= ingredient.amount;
-            const unitLong = ingredient.unitLong;
+    const promises = recipes_list.map(async (recipe) => {
+      const { id, title, readyInMinutes, image, servings, aggregateLikes, extendedIngredients, analyzedInstructions, vegan, vegetarian, glutenFree } = recipe;
   
-            return {name, amount, unitLong}
-        });
-
-        recipes_final.push({
-            recipe_id: recipe.recipe_id,
-            recipe_name: recipe.recipe_name,
-            prepare_time: recipe.prepare_time,
-            image_recipe: recipe.image_recipe,
-            portions: recipe.portions,
-            likes: recipe.likes,
-            is_vegan: recipe.is_vegan,
-            is_veget: recipe.is_veget,
-            is_glutenFree: recipe.is_glutenFree,
-            recipe_ingredient: ingredient_list,
-            recipe_instruction: steps
-            
-        })
-    }
-
-    return recipes_final
-}
+      const ingredient_list = extendedIngredients.map((ingredient) => {
+        const { name } = ingredient;
+        const { amount } = ingredient.measures.us;
+        const { unitLong } = ingredient.measures.us;
+        return { name, amount, unitLong };
+      });
+  
+      const instruct_list = analyzedInstructions.map((instruction) => {
+        const steps = instruction.steps.map((step) => step.step);
+        return { steps };
+      });
+  
+      return {
+        recipe_id: id,
+        recipe_name: title,
+        prepare_time: readyInMinutes,
+        image_recipe: image,
+        portions: servings,
+        likes: aggregateLikes,
+        is_vegan: vegan,
+        is_veget: vegetarian,
+        is_glutenFree: glutenFree,
+        recipe_ingredient: ingredient_list,
+        recipe_instruction: instruct_list
+      };
+    });
+  
+    const recipes_final = await Promise.all(promises);
+    return recipes_final;
+  }
+  
+  async function getRecipeDetailsFamily(recipes_list) {
+    const promises = recipes_list.map(async (recipe) => {
+      const result_recipe = recipe[0][0];
+      const ingre = recipe[1];
+      const steps = [{ "steps": recipe[2].map((step) => step.step_description) }];
+      const ingredient_list = ingre.map((ingredient) => {
+        const name = ingredient.ingredient_name;
+        const amount = ingredient.amount;
+        const unitLong = ingredient.unitLong;
+        return { name, amount, unitLong };
+      });
+  
+      return {
+        recipe_id: result_recipe.recipe_id,
+        recipe_name: result_recipe.recipe_name,
+        prepare_time: result_recipe.prepare_time,
+        image_recipe: result_recipe.image_recipe,
+        portions: result_recipe.portions,
+        likes: result_recipe.likes,
+        is_vegan: result_recipe.is_vegan,
+        is_veget: result_recipe.is_veget,
+        is_glutenFree: result_recipe.is_glutenFree,
+        recipe_ingredient: ingredient_list,
+        recipe_instruction: steps,
+        recipe_owner: result_recipe.recipe_owner,
+        when_prepared: result_recipe.when_prepared
+      };
+    });
+  
+    const recipes_final = await Promise.all(promises);
+    return recipes_final;
+  }
+  
+  async function getRecipeDetailsPersonal(recipes_list) {
+    const promises = recipes_list.map(async (recipe) => {
+      const result_recipe = recipe[0][0];
+      const ingre = recipe[1];
+      const steps = [{ "steps": recipe[2].map((step) => step.step_description) }];
+      const ingredient_list = ingre.map((ingredient) => {
+        const name = ingredient.ingredient_name;
+        const amount = ingredient.amount;
+        const unitLong = ingredient.unitLong;
+        return { name, amount, unitLong };
+      });
+  
+      return {
+        recipe_id: result_recipe.recipe_id,
+        recipe_name: result_recipe.recipe_name,
+        prepare_time: result_recipe.prepare_time,
+        image_recipe: result_recipe.image_recipe,
+        portions: result_recipe.portions,
+        likes: result_recipe.likes,
+        is_vegan: result_recipe.is_vegan,
+        is_veget: result_recipe.is_veget,
+        is_glutenFree: result_recipe.is_glutenFree,
+        recipe_ingredient: ingredient_list,
+        recipe_instruction: steps
+      };
+    });
+  
+    const recipes_final = await Promise.all(promises);
+    return recipes_final;
+  }
 
 
 
 async function getRecipesPreview(recipe_array) {
-
-    let API_id_list = [];
-    let Personal_id_list = [];
-    let Family_id_list = [];
-
-    for (i=0; i<recipe_array.length; i++){
-
-        let recipe_type = recipe_array[i][1];
-        let recipe_id = recipe_array[i][0];
-
-        if (recipe_type=='API'){
-            API_id_list.push(recipe_id);
-        }
-        else if (recipe_type=='personal'){
-            Personal_id_list.push(recipe_id); 
-        }
-        else if (recipe_type=='family'){
-            Family_id_list.push(recipe_id);
-        }
-
-    }
-
-    //get the recipes from the API spoon
-    rec_api = await handleApiRecipeById(API_id_list);
-
-
-    //get the recipes from family recipes
-    rec_family = await handleFamilyRecipeById(Family_id_list);
-
-    //get the recipes from personal recipes
-    rec_personal = await handlePersonalRecipeById(Personal_id_list);
-
-
-    return {"API": rec_api, 
-            "personal": rec_personal,
-            "family": rec_family}
-}
-
-async function handleFamilyRecipeById(recipes_id_list) {
-    recipes_f_list=[]
- 
-    for(i=0; i<recipes_id_list.length; i++){
-        const result_recipe = await DButils.execQuery(`SELECT * from FamilyRecipes WHERE recipe_id=${recipes_id_list[i]}`);
+    const API_id_list = [];
+    const Personal_id_list = [];
+    const Family_id_list = [];
   
-        const result_ingre = await DButils.execQuery(`SELECT ingredient_name, amount, unitLong from RecipesIngredients WHERE recipe_id=${recipes_id_list[i]} AND recipe_type='family'`);
-
-        const result_steps = await DButils.execQuery(`SELECT step_description from RecipesInstructions WHERE recipe_id=${recipes_id_list[i]} AND recipe_type = 'family' ORDER BY step_number`);
-        recipes_f_list.push([result_recipe, result_ingre, result_steps]);
+    for (let i = 0; i < recipe_array.length; i++) {
+      const recipe_type = recipe_array[i].recipe_type;
+      const recipe_id = recipe_array[i].recipe_id;
+  
+      if (recipe_type === 'API') {
+        API_id_list.push(recipe_id);
+      } else if (recipe_type === 'personal') {
+        Personal_id_list.push(recipe_id);
+      } else if (recipe_type === 'family') {
+        Family_id_list.push(recipe_id);
+      }
     }
+  
+    const [rec_api, rec_family, rec_personal] = await Promise.all([
+      handleApiRecipeById(API_id_list),
+      handleFamilyRecipeById(Family_id_list),
+      handlePersonalRecipeById(Personal_id_list)
+    ]);
+  
+    return {
+      API: rec_api,
+      personal: rec_personal,
+      family: rec_family
+    };
+  }
 
+  async function handleFamilyRecipeById(recipes_id_list) {
+    const promises = recipes_id_list.map((recipe_id) => {
+      const result_recipe = DButils.execQuery(`SELECT * FROM FamilyRecipes WHERE recipe_id=${recipe_id}`);
+      const result_ingre = DButils.execQuery(`SELECT ingredient_name, amount, unitLong FROM RecipesIngredients WHERE recipe_id=${recipe_id} AND recipe_type='family'`);
+      const result_steps = DButils.execQuery(`SELECT step_description FROM RecipesInstructions WHERE recipe_id=${recipe_id} AND recipe_type='family' ORDER BY step_number`);
+      return Promise.all([result_recipe, result_ingre, result_steps]);
+    });
+  
+    const recipes_f_list = await Promise.all(promises);
     const final_recipes = await getRecipeDetailsFamily(recipes_f_list);
     return final_recipes;
-}
-
-async function handlePersonalRecipeById(recipes_id_list) {
-    recipes_p_list=[]
-
-    for(i=0; i<recipes_id_list.length; i++){
-        const result_recipe = await DButils.execQuery(`SELECT * from PersonalRecipes WHERE recipe_id=${recipes_id_list[i]}`);
-        const result_ingre = await DButils.execQuery(`SELECT ingredient_name, amount, unitLong from RecipesIngredients WHERE recipe_id=${recipes_id_list[i]} AND recipe_type='personal'`);
-        const result_steps = await DButils.execQuery(`SELECT step_description from RecipesInstructions WHERE recipe_id=${recipes_id_list[i]} AND recipe_type = 'personal' ORDER BY step_number`);
-        recipes_p_list.push([result_recipe, result_ingre, result_steps]);
-    }
-
+  }
+  
+  async function handlePersonalRecipeById(recipes_id_list) {
+    const promises = recipes_id_list.map((recipe_id) => {
+      const result_recipe = DButils.execQuery(`SELECT * FROM PersonalRecipes WHERE recipe_id=${recipe_id}`);
+      const result_ingre = DButils.execQuery(`SELECT ingredient_name, amount, unitLong FROM RecipesIngredients WHERE recipe_id=${recipe_id} AND recipe_type='personal'`);
+      const result_steps = DButils.execQuery(`SELECT step_description FROM RecipesInstructions WHERE recipe_id=${recipe_id} AND recipe_type='personal' ORDER BY step_number`);
+      return Promise.all([result_recipe, result_ingre, result_steps]);
+    });
+  
+    const recipes_p_list = await Promise.all(promises);
     const final_recipes = await getRecipeDetailsPersonal(recipes_p_list);
     return final_recipes;
-}
-
-async function handleApiRecipeById(recipes_id_list) {
-    const idString = recipes_id_list.map(item => item.toString()).join(',');
-    let response = await handleInfoBulk(idString);
+  }
+  
+  async function handleApiRecipeById(recipes_id_list) {
+    const idString = recipes_id_list.join(',');
+    const response = await handleInfoBulk(idString);
     const recipes = await getRecipeDetailsAPI(response.data);
     return recipes;
-}
-
+  }
+  
+  async function handleInfoBulk(id_string) {
+    return axios.get(`${api_domain}/informationBulk`, {
+      headers: {
+        "x-api-key": process.env.APIKEYSPOON
+      },
+      params: {
+        "ids": id_string
+      }
+    });
+  }
+  
 
 
 async function RandomRecipe(number) {
@@ -259,18 +247,6 @@ async function handlesearchRecipes(recipe_name,amount_recipes=5 , sort, cuisine,
         params: params_api
     });
 }
-
-async function handleInfoBulk(id_string) {
-    return await axios.get(`${api_domain}/informationBulk`, {
-        headers:{
-            "x-api-key":process.env.APIKEYSPOON
-        },
-        params: {            
-            "ids": id_string
-    }
-    });
-}
-    
 
 
 

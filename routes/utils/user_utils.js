@@ -11,11 +11,12 @@ async function markAsFavorite(user_id, recipe_id, recipe_type){
     return;
 }
 
-async function getFavoriteRecipes(user_id){
-    const recipes_id = await DButils.execQuery(`SELECT recipe_id, recipe_type from FavoriteRecipes WHERE user_id='${user_id}'`);
+async function getFavoriteRecipes(user_id) {
+    const recipes_id = await DButils.execQuery(
+      `SELECT recipe_id, recipe_type FROM FavoriteRecipes WHERE user_id='${user_id}'`
+    );
     return recipes_id;
-}
-
+  }
 async function getPersonalRecipes(user_id){
     const recipes_id = await DButils.execQuery(`SELECT recipe_id from PersonalRecipes WHERE user_id='${user_id}'`);
     const ids = recipes_id.map(item => item.recipe_id);

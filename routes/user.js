@@ -39,23 +39,19 @@ router.put('/userFavoriteRecipes/:recipe_id/:recipe_type', async (req,res,next) 
 })
 
 /**
- * This path returns the favorites recipes that were saved by the logged-in user
+ * This path returns the favorite recipes that were saved by the logged-in user
  */
-router.get('/userFavoriteRecipes', async (req,res,next) => {
-  try{
+router.get('/userFavoriteRecipes', async (req, res, next) => {
+  try {
     const user_id = req.session.user_id;
-    let favorite_recipes = {};
     const recipes_id = await user_utils.getFavoriteRecipes(user_id);
-    let recipes_id_array = [];
-    recipes_id.map((element) => recipes_id_array.push([element.recipe_id, element.recipe_type])); //extracting the recipe ids and recipe_type into array
-    const results = await recipe_utils.getRecipesPreview(recipes_id_array);
-    console.log({"recipes":[results][0].API[0].recipe_instruction});
-    res.status(200).send({"recipes":[results]});
-  } catch(error){
-    next(error); 
+    const results = await recipe_utils.getRecipesPreview(recipes_id);
+    console.log({ "recipes": results.API[0].recipe_instruction });
+    res.status(200).send({ "recipes": results });
+  } catch (error) {
+    next(error);
   }
 });
-
 router.get('/userPersonalRecipes', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
