@@ -103,7 +103,6 @@ router.get("/userViewedRecipes", async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
     const recipes = await user_utils.getViewedRecipes(user_id,0);
-    console.log("recipes:: ",recipes);
     res.send({"recipes":recipes});
   } catch (error) {
     next(error);
@@ -181,4 +180,16 @@ router.post('/createFamilyRecipe', async (req,res,next) => {
   }
 })
 
+/**
+ * This path returns the user_id of the logged-in user
+ */
+router.get("/getUserId", async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    console.log("user_id",user_id);
+    res.send({"user_id": user_id});
+  } catch (error) {
+    next(error);
+  }
+});
 module.exports = router;

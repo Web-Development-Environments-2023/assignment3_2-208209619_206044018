@@ -137,7 +137,25 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Recipe'
-  
+
+  /users/getUserId:
+    get:
+      tags:
+      - user
+      summary: returns user's id
+      responses:
+        "200":
+          description: Returns user's ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                    description: The ID of the user
+                    example: 12345
+
   /users/createFamilyRecipe:
     post:
       tags:
