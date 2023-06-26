@@ -90,21 +90,27 @@ paths:
                 items:
                   $ref: '#/components/schemas/Recipe'
   
-  /recipes/searchRecipes/{amount_recipes}/{recipe_name}/{cuisine}/{diet}/{intolerance}:
+  /recipes/searchRecipes/{recipe_name}/{amount_recipes}/{sort}/{cuisine}/{diet}/{intolerance}:
     get:
       tags:
       - recipes
       summary: array with recipes
       parameters:
+        - name: recipe_name
+          in: path
+          description: The name recipe to search
+          required: true
+          schema:
+            type: string
         - name: amount_recipes
           in: path
           description: The number recipes to search
           required: true
           schema:
-            type: number
-        - name: recipe_name
+            type: number    
+        - name: sort
           in: path
-          description: The name recipe to search
+          description: The type of sort of the search results
           required: true
           schema:
             type: string
@@ -132,8 +138,6 @@ paths:
           content:
             application/json:
               schema:
-                maxItems: 3
-                minItems: 3
                 type: array
                 items:
                   $ref: '#/components/schemas/Recipe'
