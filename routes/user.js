@@ -186,7 +186,6 @@ router.post('/createFamilyRecipe', async (req,res,next) => {
 router.get("/getUserId", async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
-    console.log("user_id",user_id);
     res.send({"user_id": user_id});
   } catch (error) {
     next(error);
