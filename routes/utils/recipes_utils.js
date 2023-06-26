@@ -227,8 +227,8 @@ async function handleRandomRecipe(number) {
 }
 
 
-async function searchRecipes(amount_recipes, recipe_name, cuisine, diet, intolerance) {
-    let apiResponse = await handlesearchRecipes(amount_recipes, recipe_name, cuisine, diet, intolerance);
+async function searchRecipes(recipe_name,amount_recipes,sort, cuisine, diet, intolerance) {
+    let apiResponse = await handlesearchRecipes(recipe_name,amount_recipes,sort, cuisine, diet, intolerance);
 
     //the id of the recipes search
     console.log(apiResponse.data.results);
@@ -241,12 +241,12 @@ async function searchRecipes(amount_recipes, recipe_name, cuisine, diet, intoler
     return recipes;
     
 }
-async function handlesearchRecipes(amount_recipes=5, recipe_name, cuisine, diet, intolerance) {
-    list_arguments = [parseInt(amount_recipes), recipe_name, cuisine, diet, intolerance]
-    list_params_name = ["number", "query", "cuisine", "diet", "intolerances"]
+async function handlesearchRecipes(recipe_name,amount_recipes=5 , sort, cuisine, diet, intolerance) {
+    list_arguments = [recipe_name,parseInt(amount_recipes),sort, cuisine, diet, intolerance]
+    list_params_name = ["query",  "number", "sort", "cuisine", "diet", "intolerances"]
     params_api = {};
 
-    for(let i=0; i<5; i++){
+    for(let i=0; i<6; i++){
         if (list_arguments[i] !== 'null'){
             params_api[list_params_name[i]]=list_arguments[i]
         }
