@@ -49,9 +49,41 @@ router.get('/userFavoriteRecipes', async (req, res, next) => {
     console.log({ "recipes": results.API[0].recipe_instruction });
     res.status(200).send({ "recipes": results });
   } catch (error) {
-    next(error);
+    next(error); 
   }
 });
+
+/**
+ * This path returns the favorite recipes that were saved by the logged-in user
+ */
+router.get('/userFavoriteRecipes', async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const recipes_id = await user_utils.getFavoriteRecipes(user_id);
+    console.log({ "recipes": results.API[0].recipe_instruction });
+    res.status(200).send({ "recipes": results });
+  } catch (error) {
+    next(error); 
+  }
+});
+
+/**
+ * This path returns the favorite recipes that were saved by the logged-in user
+ */
+router.get('/userFavoriteRecipesByIdType', async (req, res, next) => {
+  try {
+    recipe_id_type = [];
+    const user_id = req.session.user_id;
+    const recipe_Id_type = await user_utils.getFavoriteRecipes(user_id);
+    //extracting the recipe ids and recipe_type into array
+    res.status(200).send({ "recipes": recipe_Id_type});
+  } catch (error) {
+    next(error); 
+  }
+});
+
+
+
 router.get('/userPersonalRecipes', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
@@ -175,6 +207,7 @@ router.post('/createFamilyRecipe', async (req,res,next) => {
     next(error);
   }
 })
+// get id
 
 /**
  * This path returns the user_id of the logged-in user
