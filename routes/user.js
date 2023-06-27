@@ -45,8 +45,12 @@ router.get('/userFavoriteRecipes', async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
     const recipes_id = await user_utils.getFavoriteRecipes(user_id);
-    const results = await recipe_utils.getRecipesPreview(recipes_id);
-    console.log({ "recipes": results.API[0].recipe_instruction });
+    if(recipes_id.length<=0){
+      results=[];
+    }
+    else{
+      results = await recipe_utils.getRecipesPreview(recipes_id);
+    }
     res.status(200).send({ "recipes": results });
   } catch (error) {
     next(error); 
