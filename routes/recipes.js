@@ -28,9 +28,9 @@ router.get("/searchRecipes/:recipe_name/:amount_recipes/:sort/:cuisine/:diet/:in
     const cuisine = req.params.cuisine
     const diet = req.params.diet
     const intolerance = req.params.intolerance
-    const recipe = await recipes_utils.searchRecipes(recipe_name,amount_recipes,sort, cuisine, diet, intolerance);
+    const recipes = await recipes_utils.searchRecipes(recipe_name,amount_recipes,sort, cuisine, diet, intolerance);
     res.status(200);
-    res.send(recipe)
+    res.send({"recipes":recipes})
   } catch (error) {
     next(error);
   }
