@@ -23,39 +23,50 @@ router.use(async function (req, res, next) {
 
 
 /**
- * This path gets body with recipeId and save this recipe in the favorites list of the logged-in user
+ * Route to add a recipe to the favorites list of the logged-in user
  */
 router.put('/userFavoriteRecipes/:recipe_id/:recipe_type', async (req,res,next) => {
   try{
+    // Extract data from request parameters
     const user_id = req.session.user_id;
     const recipe_id = req.params.recipe_id;
     const recipe_type = req.params.recipe_type;
 
+    // Call the utility function to mark the recipe as favorite for the user
     await user_utils.markAsFavorite(user_id,recipe_id, recipe_type);
+
+    // Send a success response
     res.status(200).send("The Recipe successfully saved as favorite");
     } catch(error){
     next(error);
   }
 })
 
+
 /**
- * This path returns the favorite recipes that were saved by the logged-in user
+ * Route to get the favorite recipes saved by the logged-in user
  */
 router.get('/userFavoriteRecipes', async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
+    // Get the recipes ids that are saved as favorites for the user 
     const recipes_id = await user_utils.getFavoriteRecipes(user_id);
+
+    // Get the preview information for the recipes using the recipe ids
     if(recipes_id.length<=0){
       results=[];
     }
     else{
       results = await recipe_utils.getRecipesPreview(recipes_id);
     }
+
+    // Send the recipes as a response
     res.status(200).send({ "recipes": results });
   } catch (error) {
     next(error); 
   }
 });
+
 
 /**
  * This path returns the favorite recipes that were saved by the logged-in user
@@ -72,14 +83,17 @@ router.get('/userFavoriteRecipes', async (req, res, next) => {
 });
 
 /**
- * This path returns the favorite recipes that were saved by the logged-in user
+ * Route to get the favorite recipes saved by the logged-in user by id and type
  */
 router.get('/userFavoriteRecipesByIdType', async (req, res, next) => {
   try {
     recipe_id_type = [];
     const user_id = req.session.user_id;
+
+    // Get the recipes ids and types that are saved as favorites for the user 
     const recipe_Id_type = await user_utils.getFavoriteRecipes(user_id);
-    //extracting the recipe ids and recipe_type into array
+
+    // Extract the recipe ids and recipe_type into an array
     res.status(200).send({ "recipes": recipe_Id_type});
   } catch (error) {
     next(error); 
@@ -87,11 +101,13 @@ router.get('/userFavoriteRecipesByIdType', async (req, res, next) => {
 });
 
 
-
+/**
+ * Route to get personal recipes of the logged-in user
+ */
 router.get('/userPersonalRecipes', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
-    
+    // Get the personal recipes of the user 
     const personal_recipes = await user_utils.getPersonalRecipes(user_id);
     res.status(200).send({"recipes":personal_recipes});
   } catch(error){
@@ -100,27 +116,35 @@ router.get('/userPersonalRecipes', async (req,res,next) => {
 });
 
 
+/**
+ * Route to get family recipes of the logged-in user
+ */
 router.get('/userFamilyRecipes', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
-    
+    // Get the family recipes of the user 
     const family_recipes = await user_utils.getFamilyRecipes(user_id);
     res.status(200).send({"recipes":family_recipes});
   } catch(error){
     next(error); 
   }
 });
+
+
 /**
- * This path returns the last 3 recepies that were viewed by the logged-in user
+ * Route to get the last 3 recipes viewed by the logged-in user
  */
 router.get("/userLastViewedRecipes", async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
+    // Get the last 3 viewed recipes by the user 
     const recipes_id_type = await user_utils.getViewedRecipes(user_id,3);
-    
+
+    // Filter out recipes with recipe_type !== "API" and get the recipe_ids
     const filteredRecipesId = recipes_id_type.filter(recipe => recipe.recipe_type === "API");
     const recipeIds = filteredRecipesId.map(recipe => recipe.recipe_id);
 
+    // Get the preview information for the recipes using the recipe ids 
     const recipes = await recipe_utils.handleApiRecipeById(recipeIds);
     res.send({ "recipes": recipes });
 
@@ -128,12 +152,16 @@ router.get("/userLastViewedRecipes", async (req, res, next) => {
     next(error);
   }
 });
+
+
 /**
- * This path returns all the recepies that were viewed by the logged-in user
+ * Route to get all the recipes viewed by the logged-in user
  */
 router.get("/userViewedRecipes", async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
+
+    // Get all the viewed recipes by the user
     const recipes = await user_utils.getViewedRecipes(user_id,0);
     res.send({"recipes":recipes});
   } catch (error) {
@@ -143,7 +171,7 @@ router.get("/userViewedRecipes", async (req, res, next) => {
 
 
 /**
- * This path updates the viewed recepies that were viewed by the logged-in user
+ * Route to update the viewed recipes for the logged-in user
  */
 router.put("/userViewedRecipes/:recipe_id/:recipe_type", async (req, res, next) => {
   try {
@@ -151,6 +179,7 @@ router.put("/userViewedRecipes/:recipe_id/:recipe_type", async (req, res, next) 
     const recipe_id = req.params.recipe_id;
     const recipe_type = req.params.recipe_type;
 
+    // Update the viewed recipes for the user 
     await user_utils.putViewedRecipes(user_id,recipe_id, recipe_type);
     res.status(200).send('Put operation of userViewedRecipes succeeded');
   } catch (error) {
@@ -160,7 +189,7 @@ router.put("/userViewedRecipes/:recipe_id/:recipe_type", async (req, res, next) 
 
 
 /**
- * This path gets body with recipe details creates and save this recipe in the PersonalRecipes table of the logged-in user
+ * Route to create and save a personal recipe for the logged-in user
  */
 router.post('/createPersonalRecipe', async (req,res,next) => {
   try{
@@ -176,6 +205,7 @@ router.post('/createPersonalRecipe', async (req,res,next) => {
     const RecipesIngredients = req.body.RecipesIngredients;
     const RecipesInstructions = req.body.RecipesInstructions;
 
+    // Call the utility function to create and save the personal recipe 
     await user_utils.createPersonalRecipe(user_id,recipe_name,prepare_time,likes,is_vegan,is_veget,is_glutenFree,portions,image_recipe,RecipesIngredients, RecipesInstructions);
     res.status(200).send("The Recipe successfully created as personal recipe");
     } catch(error){
@@ -186,7 +216,7 @@ router.post('/createPersonalRecipe', async (req,res,next) => {
 
 
 /**
- * This path gets body with recipe details creates and save this recipe in the FamilyRecipes table of the logged-in user
+ * Route to create and save a family recipe for the logged-in user
  */
 router.post('/createFamilyRecipe', async (req,res,next) => {
   try{
@@ -204,17 +234,16 @@ router.post('/createFamilyRecipe', async (req,res,next) => {
     const RecipesIngredients = req.body.RecipesIngredients;
     const RecipesInstructions = req.body.RecipesInstructions;
 
-
+    // Call the utility function to create and save the family recipe 
     await user_utils.createFamilyRecipe(user_id,recipe_name,prepare_time,likes,is_vegan,is_veget,is_glutenFree,portions,image_recipe,recipe_owner,when_prepared,RecipesIngredients, RecipesInstructions);
     res.status(200).send("The Recipe successfully created as family recipe");
     } catch(error){
     next(error);
   }
 })
-// get id
 
 /**
- * This path returns the user_id of the logged-in user
+ * Route to get the user_id of the logged-in user
  */
 router.get("/getUserId", async (req, res, next) => {
   try {
@@ -224,4 +253,6 @@ router.get("/getUserId", async (req, res, next) => {
     next(error);
   }
 });
+
+
 module.exports = router;

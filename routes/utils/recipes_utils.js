@@ -4,21 +4,11 @@ const api_domain = "https://api.spoonacular.com/recipes";
 const DButils = require("./DButils");
 
 
-
 /**
- * Get recipes list from spooncular response and extract the relevant recipe data for preview
- * @param {*} recipes_info 
+ * Extracts relevant recipe data from the spoonacular response for preview.
+ * @param {Array} recipes_info - The list of recipe objects from the spoonacular response.
+ * @returns {Promise<Array>} - A promise that resolves with an array of recipe objects with relevant data for preview.
  */
-
-
-// async function getRecipeInformation(recipe_id) {
-//     return await axios.get(`${api_domain}/${recipe_id}/information`, {
-//         params: {
-//             includeNutrition: false,
-//             apiKey: process.env.spooncular_apiKey
-//         }
-//     });
-// }
 async function getRecipeDetailsAPI(recipes_list) {
     const promises = recipes_list.map(async (recipe) => {
       const { id, title, readyInMinutes, image, servings, aggregateLikes, extendedIngredients, analyzedInstructions, vegan, vegetarian, glutenFree } = recipe;
@@ -54,6 +44,12 @@ async function getRecipeDetailsAPI(recipes_list) {
     return recipes_final;
   }
   
+
+  /**
+ * Extracts relevant recipe data from the FamilyRecipes table for family recipe preview.
+ * @param {Array} recipes_list - The list of recipe objects from the FamilyRecipes table.
+ * @returns {Promise<Array>} - A promise that resolves with an array of recipe objects with relevant data for family recipe preview.
+ */
   async function getRecipeDetailsFamily(recipes_list) {
     const promises = recipes_list.map(async (recipe) => {
       const result_recipe = recipe[0][0];
@@ -87,6 +83,12 @@ async function getRecipeDetailsAPI(recipes_list) {
     return recipes_final;
   }
   
+
+  /**
+ * Extracts relevant recipe data from the PersonalRecipes table for personal recipe preview.
+ * @param {Array} recipes_list - The list of recipe objects from the PersonalRecipes table.
+ * @returns {Promise<Array>} - A promise that resolves with an array of recipe objects with relevant data for personal recipe preview.
+ */
   async function getRecipeDetailsPersonal(recipes_list) {
     const promises = recipes_list.map(async (recipe) => {
       const result_recipe = recipe[0][0];
@@ -119,7 +121,11 @@ async function getRecipeDetailsAPI(recipes_list) {
   }
 
 
-
+/**
+ * Extracts relevant recipe data from the recipe_array for preview.
+ * @param {Array} recipe_array - The list of recipe objects from different sources (API, PersonalRecipes, FamilyRecipes).
+ * @returns {Promise<Object>} - A promise that resolves with an object containing recipes preview from different sources.
+ */
 async function getRecipesPreview(recipe_array) {
     const API_id_list = [];
     const Personal_id_list = [];
@@ -151,6 +157,12 @@ async function getRecipesPreview(recipe_array) {
     };
   }
 
+
+  /**
+ * Retrieves family recipes details by their IDs from the FamilyRecipes table.
+ * @param {Array} recipes_id_list - The list of family recipe IDs.
+ * @returns {Promise<Array>} - A promise that resolves with an array of recipe objects with relevant data for family recipes.
+ */
   async function handleFamilyRecipeById(recipes_id_list) {
     const promises = recipes_id_list.map((recipe_id) => {
       const result_recipe = DButils.execQuery(`SELECT * FROM FamilyRecipes WHERE recipe_id=${recipe_id}`);
@@ -164,6 +176,12 @@ async function getRecipesPreview(recipe_array) {
     return final_recipes;
   }
   
+
+  /**
+ * Retrieves personal recipes details by their IDs from the PersonalRecipes table.
+ * @param {Array} recipes_id_list - The list of personal recipe IDs.
+ * @returns {Promise<Array>} - A promise that resolves with an array of recipe objects with relevant data for personal recipes.
+ */
   async function handlePersonalRecipeById(recipes_id_list) {
     const promises = recipes_id_list.map((recipe_id) => {
       const result_recipe = DButils.execQuery(`SELECT * FROM PersonalRecipes WHERE recipe_id=${recipe_id}`);
@@ -177,6 +195,12 @@ async function getRecipesPreview(recipe_array) {
     return final_recipes;
   }
   
+
+  /**
+ * Retrieves API recipes details by their IDs using the spoonacular API.
+ * @param {Array} recipes_id_list - The list of API recipe IDs.
+ * @returns {Promise<Array>} - A promise that resolves with an array of recipe objects with relevant data for API recipes.
+ */
   async function handleApiRecipeById(recipes_id_list) {
     const idString = recipes_id_list.join(',');
     const response = await handleInfoBulk(idString);
@@ -184,6 +208,12 @@ async function getRecipesPreview(recipe_array) {
     return recipes;
   }
   
+
+  /**
+ * Retrieves recipe information for multiple recipe IDs from the spoonacular API.
+ * @param {string} id_string - Comma-separated string of recipe IDs.
+ * @returns {Promise<Object>} - A promise that resolves with the response data containing information for multiple recipes.
+ */
   async function handleInfoBulk(id_string) {
     return axios.get(`${api_domain}/informationBulk`, {
       headers: {
@@ -196,13 +226,23 @@ async function getRecipesPreview(recipe_array) {
   }
   
 
-
+/**
+ * Fetches a random number of recipes from the spoonacular API.
+ * @param {number} number - The number of random recipes to fetch.
+ * @returns {Promise<Array>} - A promise that resolves with an array of recipe objects with relevant data for the random recipes.
+ */
 async function RandomRecipe(number) {
     let response = await handleRandomRecipe(number);
     let recipes = await getRecipeDetailsAPI(response.data.recipes);
     return recipes;
     
 }
+
+/**
+ * Retrieves a random number of recipes from the spoonacular API.
+ * @param {number} number - The number of random recipes to retrieve.
+ * @returns {Promise<Object>} - A promise that resolves with the response data containing the random recipes.
+ */
 async function handleRandomRecipe(number) {
     return await axios.get(`${api_domain}/random`, {
         headers:{
@@ -215,10 +255,20 @@ async function handleRandomRecipe(number) {
 }
 
 
+/**
+ * Searches for recipes with specified parameters using the spoonacular API.
+ * @param {string} recipe_name - The name of the recipe to search for.
+ * @param {number} amount_recipes - The number of recipes to retrieve.
+ * @param {string} sort - The sorting method for the search results.
+ * @param {string} cuisine - The cuisine type to filter recipes.
+ * @param {string} diet - The diet type to filter recipes.
+ * @param {string} intolerance - The intolerance type to filter recipes.
+ * @returns {Promise<Array>} - A promise that resolves with an array of recipe objects with relevant data for the searched recipes.
+ */
 async function searchRecipes(recipe_name,amount_recipes,sort, cuisine, diet, intolerance) {
     let apiResponse = await handlesearchRecipes(recipe_name,amount_recipes,sort, cuisine, diet, intolerance);
 
-    //the id of the recipes search
+    // Extract the IDs of the searched recipes
     console.log(apiResponse.data.results);
     const idList = apiResponse.data.results.map(result => result.id);
     const idString = idList.map(item => item.toString()).join(',');
@@ -229,6 +279,18 @@ async function searchRecipes(recipe_name,amount_recipes,sort, cuisine, diet, int
     return recipes;
     
 }
+
+
+/**
+ * Searches for recipes with specified parameters using the spoonacular API.
+ * @param {string} recipe_name - The name of the recipe to search for.
+ * @param {number} amount_recipes - The number of recipes to retrieve.
+ * @param {string} sort - The sorting method for the search results.
+ * @param {string} cuisine - The cuisine type to filter recipes.
+ * @param {string} diet - The diet type to filter recipes.
+ * @param {string} intolerance - The intolerance type to filter recipes.
+ * @returns {Promise<Object>} - A promise that resolves with the response data containing the searched recipes.
+ */
 async function handlesearchRecipes(recipe_name,amount_recipes=5 , sort, cuisine, diet, intolerance) {
     list_arguments = [recipe_name,parseInt(amount_recipes),sort, cuisine, diet, intolerance]
     list_params_name = ["query",  "number", "sort", "cuisine", "diet", "intolerances"]
@@ -253,7 +315,6 @@ async function handlesearchRecipes(recipe_name,amount_recipes=5 , sort, cuisine,
 exports.getRecipeDetailsAPI = getRecipeDetailsAPI;
 exports.searchRecipes = searchRecipes;
 exports.RandomRecipe = RandomRecipe;
-// exports.getFavoriteRecipes=getFavoriteRecipes;
 exports.getRecipesPreview = getRecipesPreview;
 exports.handlePersonalRecipeById = handlePersonalRecipeById;
 exports.handleFamilyRecipeById = handleFamilyRecipeById;
