@@ -1,0 +1,486 @@
+---
+openapi: 3.0.0
+info:
+  title: Recipes API by Reut and Lidor
+  description: This is API for a recipes website where you can watch and create different recipes.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+# Added by API Auto Mocking Plugin
+- description: SwaggerHub API Auto Mocking
+  url: https://virtserver.swaggerhub.com/RM33334/api-update-3.2/1.0.0
+- url: https://virtserver.swaggerhub.com/LIDORAVI_1/Project_3.1/1.0.0
+  description: SwaggerHub API Auto Mocking
+tags:
+- name: user
+  description: the users in the system
+- name: recipes
+  description: the recipes in the systems
+paths:
+  /Register:
+    post:
+      tags:
+      - user
+      summary: adds a user
+      description: Adds a user to the system
+      operationId: addUser
+      requestBody:
+        description: User to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        "200":
+          description: user added successfully
+        "409":
+          description: an existing user already exists
+  /Login:
+    post:
+      tags:
+      - user
+      summary: Logs a user to the system
+      description: Logs a user to the system
+      operationId: loginUser
+      requestBody:
+        description: username and password
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/login_body'
+        required: true
+      responses:
+        "200":
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        "404":
+          description: Username not found
+        "401":
+          description: Incorrect password
+  /Logout:
+    post:
+      tags:
+      - user
+      summary: Logout a user to the system
+      description: Logout a user to the system
+      operationId: Logout
+      responses:
+        "200":
+          description: User logged out successfully
+  
+  /recipes/generalRandomRecipes:
+    get:
+      tags:
+      - recipes
+      summary: array with 3 random recipes
+      responses:
+        "200":
+          description: 3 random recipes
+          content:
+            application/json:
+              schema:
+                maxItems: 3
+                minItems: 3
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+  
+  /recipes/searchRecipes/{recipe_name}/{amount_recipes}/{sort}/{cuisine}/{diet}/{intolerance}:
+    get:
+      tags:
+      - recipes
+      summary: array with recipes
+      parameters:
+        - name: recipe_name
+          in: path
+          description: The name recipe to search
+          required: true
+          schema:
+            type: string
+        - name: amount_recipes
+          in: path
+          description: The number recipes to search
+          required: true
+          schema:
+            type: number    
+        - name: sort
+          in: path
+          description: The type of sort of the search results
+          required: true
+          schema:
+            type: string
+        - name: cuisine
+          in: path
+          description: the cuisine to search by
+          required: true
+          schema:
+            type: string
+        - name: diet
+          in: path
+          description: the diet to search by
+          required: true
+          schema:
+            type: string
+        - name: intolerance
+          in: path
+          description: the diet to search by
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 3 random recipes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+
+  /users/getUserId:
+    get:
+      tags:
+      - user
+      summary: returns user's id
+      responses:
+        "200":
+          description: Returns user's ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                    description: The ID of the user
+                    example: 12345
+
+  /users/createFamilyRecipe:
+    post:
+      tags:
+      - user
+      summary: Create a new recipe
+      description: Adds a new family recipe to the system
+      operationId: createFamilyRecipe
+      requestBody:
+        content:
+          
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FamilyRecipe'
+        required: true
+      responses:
+        "200":
+          description: Recipe created successfully
+  
+  /users/createPersonalRecipe:
+    post:
+      tags:
+      - user
+      summary: Create a new recipe
+      description: Adds a new personal recipe to the system
+      operationId: createPersonalRecipe
+      requestBody:
+        content:
+          
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recipe'
+        required: true
+      responses:
+        "200":
+          description: Recipe created successfully
+          
+  /users/userFavoriteRecipes:
+    get:
+      tags:
+      - user
+      summary: returns user's favorite recipes
+      responses:
+        "200":
+          description: user's favorite recipes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+                  
+  /users/userFavoriteRecipes/{recipe_id}/{recipe_type}:                
+    put:
+      tags:
+      - user
+      summary: Add a recipe to a user favorites list
+      parameters:
+        - name: recipe_id
+          in: path
+          description: The ID of the recipe
+          required: true
+          schema:
+            type: number
+        - name: recipe_type
+          in: path
+          description: The type of the recipe
+          required: true
+          schema:
+            type: string
+            example: family
+      responses:
+        "200":
+          description: Recipe added to the user's favorites list successfully
+          
+  /users/userPersonalRecipes:
+    get:
+      tags:
+      - user
+      summary: returns user's personal recipes
+      responses:
+        "200":
+          description: user's personal recipes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+                  
+  /users/userFamilyRecipes:
+    get:
+      tags:
+      - user
+      summary: returns user's family recipes
+      responses:
+        "200":
+          description: user's family recipes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FamilyRecipe'
+                  
+  /users/userLastViewedRecipes:
+    get:
+      tags:
+      - user
+      summary: get last 3 seen recipes
+      responses:
+        "200":
+          description: get seen recipes of user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  
+  /users/userViewedRecipes:
+    get:
+      tags:
+      - user
+      summary: get all seen recipes
+      responses:
+        "200":
+          description: get seen recipes of user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  
+  /users/userViewedRecipes/{recipe_id}/{recipe_type}:           
+    put:
+      tags:
+      - user
+      summary: update seen recipes
+      parameters:
+        - name: recipe_id
+          in: path
+          description: The ID of the recipe
+          required: true
+          schema:
+            type: number
+            example: 123456
+        - name: recipe_type
+          in: path
+          description: The type of the recipe
+          required: true
+          schema:
+            type: string
+            example: family
+      responses:
+        "200":
+          description: update seen recipe to user
+components:
+  schemas:
+  
+  
+    User:
+      required:
+      - username
+      - firstname
+      - lastname
+      - country
+      - password
+      - email
+
+      type: object
+      properties:
+        username:
+          maxLength: 8
+          minLength: 3
+          pattern: "^[A-Za-z]+$"
+          type: string
+          example: LidorAvi
+        firstname:
+          type: string
+          example: Lidor
+        lastname:
+          type: string
+          example: Avital
+        country:
+          type: string
+          example: Israel
+        password:
+          maxLength: 10
+          minLength: 5
+          pattern: "^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{5,10}$"
+          type: string
+          example: Lidor!1
+        email:
+          type: string
+          format: email
+          example: lidor@gmail.com
+       
+            
+    Recipe:
+      required:
+      - user_id
+      - recipe_id
+      - recipe_name
+      - prepare_time
+      - likes
+      - is_vegan
+      - is_veget
+      - is_glutenFree
+      - portions
+      - image_recipe
+      - RecipesIngredients
+      - RecipesInstructions
+      type: object
+      properties:
+        user_id:
+          type: number
+          example: 3
+        recipe_id:
+          type: number
+          example: 123456
+        recipe_name:
+          type: string
+          example: cheese cake
+        image_recipe:
+          type: object
+          format: jpg
+        prepare_time:
+          type: string
+          example: 30 minutes
+        likes:
+          type: number
+          example: 245
+        RecipesIngredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecipesIngredients'
+        is_vegan:
+          type: boolean
+          example: true
+        is_veget:
+          type: boolean
+          example: true
+        is_glutenFree:
+          type: boolean
+          example: true
+        RecipesInstructions:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecipesInstructions'
+        amountOfPortions:
+          type: number
+          example: 10
+          
+          
+    RecipesInstructions:
+      properties:
+        recipe_id:
+          type: number
+          example: 5
+        recipe_type:
+          type: string
+          example: family
+        step_description:
+          type: string
+          example: add 4 spoon of sugar
+
+
+    RecipesIngredients:
+      required:
+      - recipe_id
+      - recipe_type
+      - ingredient_name
+      - amount
+      type: object
+      properties:
+        recipe_id:
+          type: number
+          example: 5
+        recipe_type:
+          type: string
+          example: family
+        ingredient_name:
+          type: string
+          example: sugar
+        amount:
+          type: string
+          example: 0.5 glass
+
+        
+    FamilyRecipe:
+      required:
+      - recipe
+      - recipe_owner
+      - when_prepared
+      properties:
+        recipe:
+          $ref: '#/components/schemas/Recipe'
+        recipeOwner:
+          type: string
+          example: Ronen
+        whenIsItUsuallyPrepared:
+          type: string
+          example: New Year 1
+          
+          
+    login_body:
+      type: object
+      properties:
+        userName:
+          type: string
+        password:
+          type: string
+          
+          
+    inline_response_200:
+      type: object
+      properties:
+        status:
+          type: string
+        userName:
+          type: string
+          
+          
