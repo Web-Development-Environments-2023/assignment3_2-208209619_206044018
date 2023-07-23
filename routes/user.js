@@ -68,19 +68,18 @@ router.get('/userFavoriteRecipes', async (req, res, next) => {
 });
 
 
-/**
- * This path returns the favorite recipes that were saved by the logged-in user
- */
-router.get('/userFavoriteRecipes', async (req, res, next) => {
-  try {
-    const user_id = req.session.user_id;
-    const recipes_id = await user_utils.getFavoriteRecipes(user_id);
-    console.log({ "recipes": results.API[0].recipe_instruction });
-    res.status(200).send({ "recipes": results });
-  } catch (error) {
-    next(error); 
-  }
-});
+// /**
+//  * This path returns the favorite recipes that were saved by the logged-in user
+//  */
+// router.get('/userFavoriteRecipes', async (req, res, next) => {
+//   try {
+//     const user_id = req.session.user_id;
+//     const recipes_id = await user_utils.getFavoriteRecipes(user_id);
+//     res.status(200).send({ "recipes": results });
+//   } catch (error) {
+//     next(error); 
+//   }
+// });
 
 /**
  * Route to get the favorite recipes saved by the logged-in user by id and type
@@ -187,12 +186,35 @@ router.put("/userViewedRecipes/:recipe_id/:recipe_type", async (req, res, next) 
   }
 });
 
+const { body, validationResult } = require('express-validator');
 
 /**
  * Route to create and save a personal recipe for the logged-in user
  */
-router.post('/createPersonalRecipe', async (req,res,next) => {
-  try{
+router.post(
+  '/createPersonalRecipe',
+  [
+    body('recipe_name').isString().isLength({ max: 750 }),
+    body('prepare_time').isInt({ min: 1 }),
+    body('likes').isInt({ min: 0 }),
+    body('is_vegan').isIn(['true', 'false']),
+    body('is_veget').isIn(['true', 'false']),
+    body('is_glutenFree').isIn(['true', 'false']),
+    body('portions').isInt({ min: 1 }),
+    body('image_recipe').isString().isLength({ max: 750 }),
+    body('RecipesIngredients.*.ingredient_name').isString().isLength({ max: 700 }),
+    body('RecipesIngredients.*.amount').isInt({ min: 1, max: 1000 }),
+    body('RecipesIngredients.*.unitLong').isString().isLength({ max: 50 }),
+    body('RecipesInstructions.*').isString().isLength({ max: 750 }),
+  ],
+  async (req, res, next) => {
+    // Check for validation errors in the request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
     const user_id = req.session.user_id;
     const recipe_name = req.body.recipe_name;
     const prepare_time = req.body.prepare_time;
@@ -218,8 +240,32 @@ router.post('/createPersonalRecipe', async (req,res,next) => {
 /**
  * Route to create and save a family recipe for the logged-in user
  */
-router.post('/createFamilyRecipe', async (req,res,next) => {
-  try{
+router.post(
+  '/createFamilyRecipe',
+  [
+    body('recipe_name').isString().isLength({ max: 750 }),
+    body('prepare_time').isInt({ min: 1 }),
+    body('likes').isInt({ min: 0 }),
+    body('is_vegan').isIn(['true', 'false']),
+    body('is_veget').isIn(['true', 'false']),
+    body('is_glutenFree').isIn(['true', 'false']),
+    body('portions').isInt({ min: 1, max: 1000 }),
+    body('image_recipe').isString().isLength({ max: 750 }),
+    body('recipe_owner').isString().isLength({ max: 750 }),
+    body('when_prepared').isString().isLength({ max: 750 }),
+    body('RecipesIngredients.*.ingredient_name').isString().isLength({ max: 700 }),
+    body('RecipesIngredients.*.amount').isInt({ min: 1, max: 1000 }),
+    body('RecipesIngredients.*.unitLong').isString().isLength({ max: 50 }),
+    body('RecipesInstructions.*').isString().isLength({ max: 750 }),
+  ],
+  async (req, res, next) => {
+    // Check for validation errors in the request body
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
     const user_id = req.session.user_id;
     const recipe_name = req.body.recipe_name;
     const prepare_time = req.body.prepare_time;
